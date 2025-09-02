@@ -99,7 +99,6 @@ dependencies:
   path: ^1.8.3
   loadmore: ^2.1.0
   freezed_annotation: ^2.4.1
-  easy_refresh: ^3.3.2+1
 
 dev_dependencies:
   flutter_test:

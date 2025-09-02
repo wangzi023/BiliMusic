@@ -16,10 +16,23 @@ jobs:
       - name: 设置 Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.19.0'
           channel: stable
+      
+      - name: Check Flutter environment
+        run: flutter doctor -v
+
+      - name: Clean project
+        run: flutter clean
 
       - name: 获取依赖
         run: flutter pub get
+
+      - name: Debug Info
+        run: |
+          flutter --version
+          dart --version
+          flutter pub deps
 
       - name: 构建 Windows 应用
         run: flutter build windows --release

@@ -1,50 +1,48 @@
-name: Flutter Windows Build
+name: Build Windows App
 
 on:
   push:
-    branches: [master]
+    branches:
+      - main
+  # 允许手动从 GitHub Actions 界面触发此工作流
   workflow_dispatch:
 
 jobs:
   build:
+    # 在 Windows 环境下运行此任务
     runs-on: windows-latest
 
     steps:
-      - name: 检出代码
+      - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # BiliMusic 仓库较大，设置 fetch-depth 为 0 以获取所有历史记录
+          fetch-depth: 0
 
-      - name: 设置 Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          # 使用 stable 渠道的 Flutter
+          channel: 'stable'
+          # BiliMusic 项目要求 Flutter 版本大于等于 3.19.0
           flutter-version: '3.19.0'
-          channel: stable
-      
-      - name: Check Flutter environment
-        run: flutter doctor -v
 
-      - name: Clean project
-        run: flutter clean
-
-      - name: 获取依赖
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Debug Info
-        run: |
-          flutter --version
-          dart --version
-          flutter pub deps
-
-      - name: 构建 Windows 应用
+      - name: Build Windows Release
+        # 使用 --release 模式构建，生成优化后的可执行文件
         run: flutter build windows --release
 
-      - name: 打包成 ZIP
-        shell: pwsh
+      - name: Package Release
+        # 将构建好的可执行文件打包成 .zip 压缩包，方便下载
         run: |
-          $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-          Compress-Archive -Path "build/windows/runner/Release/*" -DestinationPath "app-windows-$timestamp.zip"
+          Get-ChildItem "build/windows/runner/Release" -Recurse | Compress-Archive -DestinationPath "BiliMusic-Windows.zip"
 
-      - name: 上传产物
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app
-          path: app-windows-*.zip
+          # 上传打包好的 .zip 文件
+          name: BiliMusic-Windows-Release
+          path: BiliMusic-Windows.zip
+          retention-days: 7
